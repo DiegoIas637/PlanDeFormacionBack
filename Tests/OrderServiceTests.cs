@@ -49,9 +49,8 @@ namespace Tests
             var result = await service.CreateAsync(new CreateOrderRequest
             {
                 ProductId = product.Id,
-                UserId = userId,
                 Quantity = 3
-            });
+            }, userId);
 
             Assert.Equal(product.Id, result.ProductId);
             Assert.Equal(3, result.Quantity);
@@ -78,9 +77,8 @@ namespace Tests
             await Assert.ThrowsAsync<ConflictException>(() => service.CreateAsync(new CreateOrderRequest
             {
                 ProductId = product.Id,
-                UserId = userId,
                 Quantity = 5
-            }));
+            }, userId));
 
             _orderRepository.Verify(r => r.Add(It.IsAny<Order>()), Times.Never);
             _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -96,9 +94,8 @@ namespace Tests
             await Assert.ThrowsAsync<ValidationException>(() => service.CreateAsync(new CreateOrderRequest
             {
                 ProductId = Guid.NewGuid(),
-                UserId = 1,
                 Quantity = quantity
-            }));
+            }, 1));
         }
 
         [Fact]
@@ -112,9 +109,8 @@ namespace Tests
             await Assert.ThrowsAsync<NotFoundException>(() => service.CreateAsync(new CreateOrderRequest
             {
                 ProductId = Guid.NewGuid(),
-                UserId = 99,
                 Quantity = 1
-            }));
+            }, 99));
         }
 
         [Fact]
@@ -131,9 +127,8 @@ namespace Tests
             await Assert.ThrowsAsync<NotFoundException>(() => service.CreateAsync(new CreateOrderRequest
             {
                 ProductId = Guid.NewGuid(),
-                UserId = userId,
                 Quantity = 1
-            }));
+            }, userId));
         }
     }
 }

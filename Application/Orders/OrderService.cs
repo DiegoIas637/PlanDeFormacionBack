@@ -34,15 +34,15 @@ namespace Application.Orders
             return _mapper.Map<IReadOnlyList<OrderDetailResponse>>(orders);
         }
 
-        public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, CancellationToken cancellationToken = default)
+        public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, int userId, CancellationToken cancellationToken = default)
         {
             if (request.Quantity <= 0)
             {
                 throw new ValidationException("La cantidad debe ser mayor que cero.");
             }
 
-            var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken)
-                ?? throw new NotFoundException($"No se encontró el usuario con id {request.UserId}.");
+            var user = await _userRepository.GetByIdAsync(userId, cancellationToken)
+                ?? throw new NotFoundException($"No se encontró el usuario con id {userId}.");
 
             var product = await _productRepository.GetByIdAsync(request.ProductId, cancellationToken)
                 ?? throw new NotFoundException($"No se encontró el producto con id {request.ProductId}.");

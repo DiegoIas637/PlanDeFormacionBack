@@ -7,8 +7,8 @@ namespace PlanDeFormacionBack.Controllers
 {
     [ApiController]
     [Route("api/orders")]
-    [Authorize]
-    public class OrdersController : ControllerBase
+    [Authorize(Roles = "Client")]
+    public class OrdersController : ApiControllerBase
     {
         private readonly IOrderService _orderService;
 
@@ -27,7 +27,8 @@ namespace PlanDeFormacionBack.Controllers
         [HttpPost]
         public async Task<ActionResult<OrderResponse>> Create(CreateOrderRequest request, CancellationToken cancellationToken)
         {
-            var response = await _orderService.CreateAsync(request, cancellationToken);
+            var userId = GetCurrentUserId();
+            var response = await _orderService.CreateAsync(request, userId, cancellationToken);
             return CreatedAtAction(nameof(Create), new { id = response.Id }, response);
         }
     }

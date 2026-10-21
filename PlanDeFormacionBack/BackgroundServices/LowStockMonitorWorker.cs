@@ -24,7 +24,7 @@ namespace PlanDeFormacionBack.BackgroundServices
             var interval = TimeSpan.FromSeconds(Math.Max(1, _options.IntervalSeconds));
 
             _logger.LogInformation(
-                "LowStockMonitor started. Interval: {Interval}s, Threshold: {Threshold}.",
+                "Monitor de stock bajo iniciado. Intervalo: {Interval}s, Umbral: {Threshold}.",
                 interval.TotalSeconds,
                 _options.Threshold);
 
@@ -40,7 +40,7 @@ namespace PlanDeFormacionBack.BackgroundServices
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInformation("LowStockMonitor is stopping due to cancellation.");
+                _logger.LogInformation("El monitor de stock bajo se está deteniendo.");
             }
         }
 
@@ -55,19 +55,19 @@ namespace PlanDeFormacionBack.BackgroundServices
 
                 if (lowStock.Count == 0)
                 {
-                    _logger.LogInformation("No products below the stock threshold of {Threshold}.", _options.Threshold);
+                    _logger.LogInformation("No hay productos por debajo del umbral de stock de {Threshold}.", _options.Threshold);
                     return;
                 }
 
                 _logger.LogWarning(
-                    "{Count} product(s) at or below the stock threshold of {Threshold}.",
+                    "{Count} producto(s) en o por debajo del umbral de stock de {Threshold}.",
                     lowStock.Count,
                     _options.Threshold);
 
                 foreach (var product in lowStock)
                 {
                     _logger.LogWarning(
-                        "Low stock alert: '{Name}' (Id: {Id}) has {Stock} unit(s) left.",
+                        "Alerta de stock bajo: '{Name}' (Id: {Id}) tiene {Stock} unidad(es) restante(s).",
                         product.Name,
                         product.Id,
                         product.Stock);
@@ -79,7 +79,7 @@ namespace PlanDeFormacionBack.BackgroundServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while checking low stock products.");
+                _logger.LogError(ex, "Ocurrió un error al revisar los productos con stock bajo.");
             }
         }
     }

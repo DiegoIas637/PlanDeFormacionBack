@@ -1,17 +1,14 @@
-using System.Security.Claims;
-using Application.Common.Exceptions;
 using Application.Products;
 using Application.Products.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace PlanDeFormacionBack.Controllers
 {
     [ApiController]
     [Route("api/products")]
     [Authorize(Roles = "Admin")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : ApiControllerBase
     {
         private readonly IProductService _productService;
 
@@ -40,19 +37,6 @@ namespace PlanDeFormacionBack.Controllers
             var ownerId = GetCurrentUserId();
             var product = await _productService.CreateAsync(request, ownerId, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
-        }
-
-        private int GetCurrentUserId()
-        {
-            var subject = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
-                ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!int.TryParse(subject, out var userId))
-            {
-                throw new UnauthorizedException("No se pudo identificar al usuario autenticado.");
-            }
-
-            return userId;
         }
 
         [HttpPut("{id:guid}")]
