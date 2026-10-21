@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Application.Common.Exceptions;
 using Application.Common.Security;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
@@ -42,6 +43,19 @@ namespace Infrastructure.Security
             var value = new JwtSecurityTokenHandler().WriteToken(token);
 
             return new GeneratedToken(value, expiresAt);
+        }
+
+        public int GetUserId(ClaimsPrincipal principal)
+        {
+            var subject = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(subject, out var userId))
+            {
+                throw new UnauthorizedException("No se pudo identificar al usuario autenticado.");
+            }
+
+            return userId;
         }
     }
 }

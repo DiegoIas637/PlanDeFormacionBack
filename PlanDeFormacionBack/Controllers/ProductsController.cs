@@ -1,3 +1,4 @@
+using Application.Common.Security;
 using Application.Products;
 using Application.Products.Dtos;
 using Microsoft.AspNetCore.Authorization;
@@ -8,13 +9,15 @@ namespace PlanDeFormacionBack.Controllers
     [ApiController]
     [Route("api/products")]
     [Authorize(Roles = "Admin")]
-    public class ProductsController : ApiControllerBase
+    public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly ITokenGenerator _tokenGenerator;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, ITokenGenerator tokenGenerator)
         {
             _productService = productService;
+            _tokenGenerator = tokenGenerator;
         }
 
         [HttpGet]
@@ -34,7 +37,7 @@ namespace PlanDeFormacionBack.Controllers
         [HttpPost]
         public async Task<ActionResult<ProductResponse>> Create(CreateProductRequest request, CancellationToken cancellationToken)
         {
-            var ownerId = GetCurrentUserId();
+            var ownerId = _tokenGenerator.GetUserId(User);
             var product = await _productService.CreateAsync(request, ownerId, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
         }
